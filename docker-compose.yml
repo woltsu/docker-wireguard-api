@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  wireguard-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wireguard-api
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SERVERURL=auto
+      - SERVERPORT=51820
+      - PEERS=1
+      - PEERDNS=auto
+      - INTERNAL_SUBNET=10.13.13.0/24
+      - ALLOWEDIPS=0.0.0.0/0
+      - WG_API_PORT=3000
+      - NODE_ENV=production
+    volumes:
+      - ./wireguard/config:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - "3000:3000"      # Express API
+      - "51820:51820/udp" # WireGuard
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+    networks:
+      - wireguard-network
+
+networks:
+  wireguard-network:
+    driver: bridge
+
