@@ -22,7 +22,7 @@ export class WireGuardCommandBuilder {
     if (cmd.presharedKeyFile) {
       return this.compile([
         { name: "wg" },
-        { name: "set", interface: "wg0" },
+        { name: "set", interface: cmd.interface },
         { name: "peer", publicKey: cmd.publicKey },
         { name: "preshared-key", pathToPresharedKey: cmd.presharedKeyFile },
       ]);
@@ -30,7 +30,7 @@ export class WireGuardCommandBuilder {
 
     return this.compile([
       { name: "wg" },
-      { name: "set", interface: "wg0" },
+      { name: "set", interface: cmd.interface },
       { name: "peer", publicKey: cmd.publicKey },
       { name: "allowed-ips", allowedIPs: cmd.allowedIPs },
     ]);
@@ -39,7 +39,7 @@ export class WireGuardCommandBuilder {
   removePeer(cmd: RemovePeer) {
     return this.compile([
       { name: "wg" },
-      { name: "set", interface: "wg0" },
+      { name: "set", interface: cmd.interface },
       { name: "peer", publicKey: cmd.publicKey },
       { name: "remove" },
     ]);

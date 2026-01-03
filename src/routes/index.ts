@@ -1,12 +1,19 @@
 import { Request, Response, Router } from "express";
 import { WireGuard } from "../lib/wg/WireGuard";
+import { authMiddleware } from "./middleware/authMiddleware";
 import { errorMiddleware } from "./middleware/errorMiddleware";
 
+// TODO: Take config path and interface as environment variables?
+// TODO: Export a singleton instance of WireGuard?
 const wireGuard = new WireGuard({
   configPath: "/config/wg_confs/wg0.conf",
+  interface: "wg0",
   internalSubnet: process.env.INTERNAL_SUBNET,
 });
+
 const router = Router();
+
+router.use(authMiddleware);
 
 router.get("/wg", async (req: Request, res: Response) => {
   res.json({

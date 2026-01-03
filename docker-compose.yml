@@ -21,6 +21,7 @@ services:
       - ALLOWEDIPS=0.0.0.0/0
       - WG_API_PORT=3000
       - NODE_ENV=production
+      - WG_API_KEY=12345678901234567890123456789012
     volumes:
       - ./wireguard/config:/config
       - /lib/modules:/lib/modules

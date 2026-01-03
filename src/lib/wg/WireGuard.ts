@@ -10,6 +10,7 @@ import { RemovePeer } from "./cmd/RemovePeer";
 
 type WireGuardOpts = {
   configPath: string;
+  interface: string;
   internalSubnet?: string;
 };
 
@@ -84,6 +85,7 @@ export class WireGuard {
 
       const cmd: AddPeer = {
         name: "add-peer",
+        interface: this.opts.interface,
         allowedIPs: allowedIps,
         publicKey: peerPublicKey,
         presharedKey,
@@ -120,6 +122,7 @@ export class WireGuard {
   async removePeer(publicKey: string) {
     const cmd: RemovePeer = {
       name: "remove-peer",
+      interface: this.opts.interface,
       publicKey,
     };
     const removePeerCmd = this.commandBuilder.removePeer(cmd);
