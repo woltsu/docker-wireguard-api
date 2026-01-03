@@ -1,4 +1,4 @@
-# WireGuard API
+# Docker WireGuard API
 
 A Docker image that extends [linuxserver/docker-wireguard](https://github.com/linuxserver/docker-wireguard) with a simple REST API for dynamic peer management.
 
