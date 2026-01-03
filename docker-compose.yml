@@ -17,7 +17,7 @@ services:
       - SERVERPORT=51820
       - PEERS=1
       - PEERDNS=auto
-      - INTERNAL_SUBNET=10.13.13.0/24
+      - INTERNAL_SUBNET=10.13.0.0/16
       - ALLOWEDIPS=0.0.0.0/0
       - WG_API_PORT=3000
       - NODE_ENV=production
