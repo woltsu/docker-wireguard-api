@@ -144,3 +144,25 @@ export class WireGuard {
     return stdout.trim();
   }
 }
+
+const configPath = process.env.WG_CONFIG_PATH;
+const interfaceName = process.env.WG_INTERFACE;
+const internalSubnet = process.env.INTERNAL_SUBNET;
+
+if (!configPath) {
+  throw new Error("WG_CONFIG_PATH environment variable is required");
+}
+
+if (!interfaceName) {
+  throw new Error("WG_INTERFACE environment variable is required");
+}
+
+if (!internalSubnet) {
+  throw new Error("INTERNAL_SUBNET environment variable is required");
+}
+
+export const wireGuard = new WireGuard({
+  configPath,
+  interface: interfaceName,
+  internalSubnet,
+});

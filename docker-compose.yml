@@ -19,9 +19,12 @@ services:
       - PEERDNS=auto
       - INTERNAL_SUBNET=10.13.0.0/16
       - ALLOWEDIPS=0.0.0.0/0
+      # API CONFIGURATION
       - WG_API_PORT=3000
       - NODE_ENV=production
       - WG_API_KEY=12345678901234567890123456789012
+      - WG_CONFIG_PATH=/config/wg_confs/wg0.conf
+      - WG_INTERFACE=wg0
     volumes:
       - ./wireguard/config:/config
       - /lib/modules:/lib/modules
