@@ -5,4 +5,7 @@ dist
 *.md
 .env
 .env.local
-
+wireguard/
+docker-compose.yml
+.github/
+LICENSE.txt
