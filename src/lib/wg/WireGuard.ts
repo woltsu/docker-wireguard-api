@@ -1,4 +1,5 @@
 import { readFile, writeFile, unlink } from "fs/promises";
+import { randomUUID } from "crypto";
 import { execAsync } from "../../util/exec";
 import { generateNextAllowedIP } from "../../util/ip";
 import { tmpdir } from "os";
@@ -45,10 +46,7 @@ export class WireGuard {
   }
 
   private createTempPskFile(): { path: string; cleanup: () => Promise<void> } {
-    const path = join(
-      tmpdir(),
-      `wg-psk-${Date.now()}-${Math.random().toString(36).substring(7)}`
-    );
+    const path = join(tmpdir(), `wg-psk-${randomUUID()}`);
     return {
       path,
       cleanup: async () => {
