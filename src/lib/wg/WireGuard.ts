@@ -1,10 +1,12 @@
 import { readFile, writeFile, unlink } from "fs/promises";
 import { execAsync } from "../../util/exec";
+import { generateNextAllowedIP } from "../../util/ip";
 import { tmpdir } from "os";
 import { join } from "path";
 import { AddPeer } from "./cmd/AddPeer";
 import { WireGuardCommandBuilder } from "./WireGuardCommandBuilder";
 import { WireGuardConfigBuilder } from "./WireGuardConfigBuilder";
+import { RemovePeer } from "./cmd/RemovePeer";
 
 type WireGuardOpts = {
   configPath: string;
@@ -58,47 +60,9 @@ export class WireGuard {
     };
   }
 
-  private ipToInt(ip: string): number {
-    const parts = ip.split(".").map(Number);
-    return (parts[0] << 24) + (parts[1] << 16) + (parts[2] << 8) + parts[3];
-  }
-
-  private intToIp(int: number): string {
-    return [
-      (int >>> 24) & 255,
-      (int >>> 16) & 255,
-      (int >>> 8) & 255,
-      int & 255,
-    ].join(".");
-  }
-
   async generateNextAllowedIP(): Promise<string> {
-    const [subnetIP, cidr] = this.internalSubnet.split("/");
-    const mask = parseInt(cidr, 10);
-
-    const networkInt = this.ipToInt(subnetIP);
-    const startIP = networkInt + 1;
-    const endIP = networkInt + Math.pow(2, 32 - mask) - 2;
-
     const config = await this.readConfig();
-    const usedIPs = new Set<number>();
-
-    const ipPattern = /(\d+\.\d+\.\d+\.\d+)/g;
-    let match;
-    while ((match = ipPattern.exec(config)) !== null) {
-      const ipInt = this.ipToInt(match[1]);
-      if (ipInt >= startIP && ipInt <= endIP) {
-        usedIPs.add(ipInt);
-      }
-    }
-
-    for (let ip = startIP; ip <= endIP; ip++) {
-      if (!usedIPs.has(ip)) {
-        return `${this.intToIp(ip)}/32`;
-      }
-    }
-
-    throw new Error(`No available IPs in subnet ${this.internalSubnet}`);
+    return generateNextAllowedIP(this.internalSubnet, config);
   }
 
   async addPeer() {
@@ -127,10 +91,13 @@ export class WireGuard {
       };
 
       const addPeerCmd = this.commandBuilder.addPeer(cmd);
+      const existingConfig = await this.readConfig();
+      const newConfig = this.configBuilder.compilePeerConfig(
+        cmd,
+        existingConfig
+      );
+
       await this.exec(addPeerCmd);
-      const peerConfig = this.configBuilder.compilePeerConfig(cmd);
-      const existingConfig = (await this.readConfig()).trimEnd();
-      const newConfig = existingConfig + "\n\n" + peerConfig;
       await this.writeConfig(newConfig);
 
       return {
@@ -148,6 +115,22 @@ export class WireGuard {
     } finally {
       await tempPskFile.cleanup();
     }
+  }
+
+  async removePeer(publicKey: string) {
+    const cmd: RemovePeer = {
+      name: "remove-peer",
+      publicKey,
+    };
+    const removePeerCmd = this.commandBuilder.removePeer(cmd);
+    const existingConfig = await this.readConfig();
+    const newConfig = this.configBuilder.compileRemovePeerConfig(
+      cmd,
+      existingConfig
+    );
+
+    await this.exec(removePeerCmd);
+    await this.writeConfig(newConfig);
   }
 
   private async exec(cmd: string) {

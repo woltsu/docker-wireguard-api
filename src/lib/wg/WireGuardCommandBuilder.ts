@@ -1,4 +1,5 @@
 import { AddPeer } from "./cmd/AddPeer";
+import { RemovePeer } from "./cmd/RemovePeer";
 
 type CMD_TOKEN =
   | { readonly name: "wg" }
@@ -9,7 +10,8 @@ type CMD_TOKEN =
   | { readonly name: "set"; readonly interface: string }
   | { readonly name: "peer"; readonly publicKey: string }
   | { readonly name: "preshared-key"; readonly pathToPresharedKey: string }
-  | { readonly name: "allowed-ips"; readonly allowedIPs: string };
+  | { readonly name: "allowed-ips"; readonly allowedIPs: string }
+  | { readonly name: "remove" };
 
 export class WireGuardCommandBuilder {
   show() {
@@ -31,6 +33,15 @@ export class WireGuardCommandBuilder {
       { name: "set", interface: "wg0" },
       { name: "peer", publicKey: cmd.publicKey },
       { name: "allowed-ips", allowedIPs: cmd.allowedIPs },
+    ]);
+  }
+
+  removePeer(cmd: RemovePeer) {
+    return this.compile([
+      { name: "wg" },
+      { name: "set", interface: "wg0" },
+      { name: "peer", publicKey: cmd.publicKey },
+      { name: "remove" },
     ]);
   }
 
@@ -77,6 +88,8 @@ export class WireGuardCommandBuilder {
         return `preshared-key ${token.pathToPresharedKey}`;
       case "allowed-ips":
         return `allowed-ips ${token.allowedIPs}`;
+      case "remove":
+        return `remove`;
       default:
         const _exhaustive: never = token;
         throw new Error(`Unknown token: ${_exhaustive}`);
