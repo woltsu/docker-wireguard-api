@@ -25,6 +25,7 @@ docker pull ghcr.io/woltsu/docker-wireguard-api:latest
 WG_API_KEY=your-32-character-api-key-here
 WG_CONFIG_PATH=/config/wg_confs/wg0.conf
 WG_INTERFACE=wg0
+WG_API_PORT=3000
 ```
 
 ## API Endpoints

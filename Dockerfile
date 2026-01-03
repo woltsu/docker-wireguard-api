@@ -53,9 +53,6 @@ RUN mkdir -p /etc/s6-overlay/s6-rc.d/wg-api/dependencies.d && \
 RUN mkdir -p /etc/s6-overlay/s6-rc.d/user/contents.d && \
     ln -s /etc/s6-overlay/s6-rc.d/wg-api /etc/s6-overlay/s6-rc.d/user/contents.d/wg-api || true
 
-# Expose port
-EXPOSE 3000
-
 # Keep the original entrypoint from base image (s6-overlay init)
 # ENTRYPOINT is already set to ["/init"] in the base image
 # This ensures both WireGuard and WireGuard API start via s6-overlay
