@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -37,25 +37,25 @@ RUN npm ci --only=production
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Create s6 service for Node.js app
-RUN mkdir -p /etc/s6-overlay/s6-rc.d/nodejs-app
-COPY docker/s6-nodejs-app/run /etc/s6-overlay/s6-rc.d/nodejs-app/run
-COPY docker/s6-nodejs-app/finish /etc/s6-overlay/s6-rc.d/nodejs-app/finish
-COPY docker/s6-nodejs-app/type /etc/s6-overlay/s6-rc.d/nodejs-app/type
-RUN chmod +x /etc/s6-overlay/s6-rc.d/nodejs-app/run && \
-    chmod +x /etc/s6-overlay/s6-rc.d/nodejs-app/finish
+# Create s6 service for WireGuard API
+RUN mkdir -p /etc/s6-overlay/s6-rc.d/wg-api
+COPY docker/s6-wg-api/run /etc/s6-overlay/s6-rc.d/wg-api/run
+COPY docker/s6-wg-api/finish /etc/s6-overlay/s6-rc.d/wg-api/finish
+COPY docker/s6-wg-api/type /etc/s6-overlay/s6-rc.d/wg-api/type
+RUN chmod +x /etc/s6-overlay/s6-rc.d/wg-api/run && \
+    chmod +x /etc/s6-overlay/s6-rc.d/wg-api/finish
 
 # Create service dependencies (ensures it starts after base services)
-RUN mkdir -p /etc/s6-overlay/s6-rc.d/nodejs-app/dependencies.d && \
-    touch /etc/s6-overlay/s6-rc.d/nodejs-app/dependencies.d/base
+RUN mkdir -p /etc/s6-overlay/s6-rc.d/wg-api/dependencies.d && \
+    touch /etc/s6-overlay/s6-rc.d/wg-api/dependencies.d/base
 
 # Add service to default bundle so it starts automatically
 RUN mkdir -p /etc/s6-overlay/s6-rc.d/user/contents.d && \
-    ln -s /etc/s6-overlay/s6-rc.d/nodejs-app /etc/s6-overlay/s6-rc.d/user/contents.d/nodejs-app || true
+    ln -s /etc/s6-overlay/s6-rc.d/wg-api /etc/s6-overlay/s6-rc.d/user/contents.d/wg-api || true
 
 # Expose port
 EXPOSE 3000
 
 # Keep the original entrypoint from base image (s6-overlay init)
 # ENTRYPOINT is already set to ["/init"] in the base image
-# This ensures both WireGuard and Node.js app start via s6-overlay
+# This ensures both WireGuard and WireGuard API start via s6-overlay
