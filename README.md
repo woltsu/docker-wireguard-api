@@ -20,6 +20,8 @@ docker pull ghcr.io/woltsu/docker-wireguard-api:latest
 
 > [!NOTE]
 > These are _in addition_ to the standard [linuxserver/docker-wireguard](https://github.com/linuxserver/docker-wireguard#parameters) environment variables.
+> 
+> See [`docker-compose.yml`](./docker-compose.yml) for an example setup.
 
 ```bash
 WG_API_KEY=your-32-character-api-key-here
