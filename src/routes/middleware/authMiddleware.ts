@@ -11,7 +11,7 @@ if (API_KEY.length < 32) {
   throw new Error("WG_API_KEY must be at least 32 characters long");
 }
 
-const API_KEY_BUFFER = Buffer.from(API_KEY, "utf8");
+const API_KEY_BUFFER = new Uint8Array(Buffer.from(API_KEY, "utf8"));
 
 export const authMiddleware = (
   req: Request,
@@ -34,7 +34,7 @@ export const authMiddleware = (
     return res.status(401).json({ error: "Unauthorized: Invalid API key" });
   }
 
-  const providedKeyBuffer = Buffer.from(providedKey, "utf8");
+  const providedKeyBuffer = new Uint8Array(Buffer.from(providedKey, "utf8"));
 
   if (providedKeyBuffer.length !== API_KEY_BUFFER.length) {
     return res.status(401).json({ error: "Unauthorized: Invalid API key" });

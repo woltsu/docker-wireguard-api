@@ -17,7 +17,6 @@ router.post("/wg/client", async (req: Request, res: Response) => {
   const result = await wireGuard.addPeer();
 
   res.json({
-    message: "Client created and added to WireGuard config",
     client: {
       privateKey: result.privateKey,
       publicKey: result.publicKey,
@@ -34,7 +33,6 @@ router.delete("/wg/client", async (req: Request, res: Response) => {
   await wireGuard.removePeer(publicKey);
 
   res.json({
-    message: "Client removed from WireGuard config",
     publicKey,
   });
 });
